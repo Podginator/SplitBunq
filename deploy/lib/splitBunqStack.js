@@ -75,59 +75,59 @@ class SplitBunqStack extends cdk.Stack {
       ],
     });
 
-    const ipSet = new wafv2.CfnIPSet(this, 'BunqIpSet', {
-      addresses: ['185.40.108.0/22'],
-      ipAddressVersion: 'IPV4',
-      scope: 'REGIONAL',
+    // const ipSet = new wafv2.CfnIPSet(this, 'BunqIpSet', {
+    //   addresses: ['185.40.108.0/22'],
+    //   ipAddressVersion: 'IPV4',
+    //   scope: 'REGIONAL',
 
-      // the properties below are optional
-      description: 'Bunq IP Set where they call their callbacks.',
-      name: 'BunqIp',
-    });
+    //   // the properties below are optional
+    //   description: 'Bunq IP Set where they call their callbacks.',
+    //   name: 'BunqIp',
+    // });
 
-    const wafRules = [
-      {
-        name: 'BunqIP',
-        priority: 0,
-        statement: {
-          ipSetReferenceStatement: {
-            arn: ipSet.attrArn,
-          },
-        },
-        action: {
-          allow: {},
-        },
-        visibilityConfig: {
-          sampledRequestsEnabled: false,
-          cloudWatchMetricsEnabled: false,
-          metricName: 'BunqIP',
-        },
-      },
-    ];
+    // const wafRules = [
+    //   {
+    //     name: 'BunqIP',
+    //     priority: 0,
+    //     statement: {
+    //       ipSetReferenceStatement: {
+    //         arn: ipSet.attrArn,
+    //       },
+    //     },
+    //     action: {
+    //       allow: {},
+    //     },
+    //     visibilityConfig: {
+    //       sampledRequestsEnabled: false,
+    //       cloudWatchMetricsEnabled: false,
+    //       metricName: 'BunqIP',
+    //     },
+    //   },
+    // ];
 
-    const waf = new wafv2.CfnWebACL(this, 'BunqWAF', {
-      defaultAction: {
-        block: {},
-      },
-      rules: wafRules,
-      visibilityConfig: {
-        cloudWatchMetricsEnabled: false,
-        metricName: 'BunqWAF',
-        sampledRequestsEnabled: false
-      },
-      scope: "REGIONAL",
-      name: "BunqWAF",
-      description: "WAF For Bunq Splitwise"
-    });
+    // const waf = new wafv2.CfnWebACL(this, 'BunqWAF', {
+    //   defaultAction: {
+    //     block: {},
+    //   },
+    //   rules: wafRules,
+    //   visibilityConfig: {
+    //     cloudWatchMetricsEnabled: false,
+    //     metricName: 'BunqWAF',
+    //     sampledRequestsEnabled: false
+    //   },
+    //   scope: "REGIONAL",
+    //   name: "BunqWAF",
+    //   description: "WAF For Bunq Splitwise"
+    // });
 
-    const apiGatewayARN = `arn:aws:apigateway:${cdk.Stack.of(this).region}::/restapis/${gateway.restApiId}/stages/${gateway.deploymentStage.stageName}`
+    // const apiGatewayARN = `arn:aws:apigateway:${cdk.Stack.of(this).region}::/restapis/${gateway.restApiId}/stages/${gateway.deploymentStage.stageName}`
 
-    // Associate with our gateway
-    new wafv2.CfnWebACLAssociation(this, 'WebACLAssociation', {
-      name: "WebAclBunqAssoc",
-      webAclArn: waf.attrArn,
-      resourceArn: apiGatewayARN,
-    })
+    // // Associate with our gateway
+    // new wafv2.CfnWebACLAssociation(this, 'WebACLAssociation', {
+    //   name: "WebAclBunqAssoc",
+    //   webAclArn: waf.attrArn,
+    //   resourceArn: apiGatewayARN,
+    // })
   }
 }
 
