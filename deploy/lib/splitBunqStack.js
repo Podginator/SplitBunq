@@ -26,7 +26,7 @@ class SplitBunqStack extends cdk.Stack {
     const lambdaFn = new lambda.Function(this, 'SplitwiseLambda', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../dist')),
       handler: 'lambda.handler',
-      timeout: cdk.Duration.seconds(300),
+      timeout: cdk.Duration.seconds(30),
       runtime: lambda.Runtime.NODEJS_12_X,
       environment: {
         SPLITWISE_API_KEY,
@@ -53,13 +53,11 @@ class SplitBunqStack extends cdk.Stack {
     const basePath = gateway.root.addResource('split');
 
     let lambdaIntegration = new apigw.LambdaIntegration(lambdaFn, {
-      proxy: true,
+      proxy: false,
+      requestParameters: {'integration.request.header.X-Amz-Invocation-Type': "'Event'"},
       integrationResponses: [
         {
           statusCode: '200',
-          responseParameters: {
-            'method.response.header.Access-Control-Allow-Origin': "'*'",
-          },
         },
       ],
     });
@@ -75,59 +73,60 @@ class SplitBunqStack extends cdk.Stack {
       ],
     });
 
-    const ipSet = new wafv2.CfnIPSet(this, 'BunqIpSet', {
-      addresses: ['185.40.108.0/22'],
-      ipAddressVersion: 'IPV4',
-      scope: 'REGIONAL',
+  //   const ipSet = new wafv2.CfnIPSet(this, 'BunqIpSet', {
+  //     addresses: ['185.40.108.0/22'],
+  //     ipAddressVersion: 'IPV4',
+  //     scope: 'REGIONAL',
 
-      // the properties below are optional
-      description: 'Bunq IP Set where they call their callbacks.',
-      name: 'BunqIp',
-    });
+  //     // the properties below are optional
+  //     description: 'Bunq IP Set where they call their callbacks.',
+  //     name: 'BunqIp',
+  //   });
 
-    const wafRules = [
-      {
-        name: 'BunqIP',
-        priority: 0,
-        statement: {
-          ipSetReferenceStatement: {
-            arn: ipSet.attrArn,
-          },
-        },
-        action: {
-          allow: {},
-        },
-        visibilityConfig: {
-          sampledRequestsEnabled: false,
-          cloudWatchMetricsEnabled: false,
-          metricName: 'BunqIP',
-        },
-      },
-    ];
+  //   const wafRules = [
+  //     {
+  //       name: 'BunqIP',
+  //       priority: 0,
+  //       statement: {
+  //         ipSetReferenceStatement: {
+  //           arn: ipSet.attrArn,
+  //         },
+  //       },
+  //       action: {
+  //         allow: {},
+  //       },
+  //       visibilityConfig: {
+  //         sampledRequestsEnabled: false,
+  //         cloudWatchMetricsEnabled: false,
+  //         metricName: 'BunqIP',
+  //       },
+  //     },
+  //   ];
 
-    const waf = new wafv2.CfnWebACL(this, 'BunqWAF', {
-      defaultAction: {
-        block: {},
-      },
-      rules: wafRules,
-      visibilityConfig: {
-        cloudWatchMetricsEnabled: false,
-        metricName: 'BunqWAF',
-        sampledRequestsEnabled: false
-      },
-      scope: "REGIONAL",
-      name: "BunqWAF",
-      description: "WAF For Bunq Splitwise"
-    });
+  //   const waf = new wafv2.CfnWebACL(this, 'BunqWAF', {
+  //     defaultAction: {
+  //       block: {},
+  //     },
+  //     rules: wafRules,
+  //     visibilityConfig: {
+  //       cloudWatchMetricsEnabled: false,
+  //       metricName: 'BunqWAF',
+  //       sampledRequestsEnabled: false
+  //     },
+  //     scope: "REGIONAL",
+  //     name: "BunqWAF",
+  //     description: "WAF For Bunq Splitwise"
+  //   });
 
-    const apiGatewayARN = `arn:aws:apigateway:${cdk.Stack.of(this).region}::/restapis/${gateway.restApiId}/stages/${gateway.deploymentStage.stageName}`
+  //   const apiGatewayARN = `arn:aws:apigateway:${cdk.Stack.of(this).region}::/restapis/${gateway.restApiId}/stages/${gateway.deploymentStage.stageName}`
 
-    // Associate with our gateway
-    new wafv2.CfnWebACLAssociation(this, 'WebACLAssociation', {
-      name: "WebAclBunqAssoc",
-      webAclArn: waf.attrArn,
-      resourceArn: apiGatewayARN,
-    })
+  //   // Associate with our gateway
+  //   new wafv2.CfnWebACLAssociation(this, 'WebACLAssociation', {
+  //     name: "WebAclBunqAssoc",
+  //     webAclArn: waf.attrArn,
+  //     resourceArn: apiGatewayARN,
+  //   })
+  // }
   }
 }
 

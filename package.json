@@ -13,14 +13,14 @@
     "build": "npx tsc --project tsconfig.json && cp -a ./package.json ./dist/package.json && cd dist && npm i --production"
   },
   "dependencies": {
-    "aws-lambda-fastify": "^2.2.0",
+    "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1223.0",
     "axios": "^0.27.2",
-    "fastify": "^3.29.2",
     "http-errors": "^1.8.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.106",
     "@types/node": "^13.13.52",
     "@types/node-uuid": "0.0.28",
     "@types/uuid": "^8.3.0",
