@@ -2,7 +2,6 @@ import fastify from 'fastify';
 import * as errors from './utils/errors';
 import * as splitbunq from './routes/splitbunq';
 import { logger } from './utils/logging';
-import 'reflect-metadata';
 
 export const app = fastify();
 
